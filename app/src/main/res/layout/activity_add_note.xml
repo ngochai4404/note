@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorNote"
+    android:scrollbars="vertical"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="@string/title"
+                android:id="@+id/tv_title"
+                android:textStyle="bold"
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tv_date"
+                android:text="@string/date_format"
+                android:layout_width="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_height="wrap_content" />
+            <com.hai.note.custom.NoteView
+                android:id="@+id/et_title"
+                android:singleLine="true"
+                android:layout_marginHorizontal="5dp"
+                android:background="@android:color/transparent"
+                android:layout_centerInParent="true"
+                android:layout_toRightOf="@id/tv_title"
+                android:layout_toLeftOf="@id/tv_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </RelativeLayout>
+        <com.hai.note.custom.NoteView
+            android:gravity="top"
+            android:background="@android:color/transparent"
+            android:layout_width="match_parent"
+            android:minLines="8"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+            <ImageButton
+                android:src="@drawable/ic_alarm"
+                android:background="@android:color/transparent"
+                android:scaleType="centerInside"
+                android:layout_width="30dp"
+                android:layout_height="30dp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+

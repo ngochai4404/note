@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">note</string>
+    <!--menu add note-->
+    <string name="insert_image">Insert image</string>
+    <string name="choose_color">Choose color</string>
+    <string name="done">Done</string>
+    <!--menu home-->
+    <string name="new_note">New note</string>
+    
+    <!--add note-->
+    <string name="title">Title</string>
+    <string name="date_format">dd/mm/yyyy hh:ss</string>
+</resources>

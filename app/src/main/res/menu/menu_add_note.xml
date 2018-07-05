@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:apps="http://schemas.android.com/apk/res-auto">
+    <item
+        apps:showAsAction="always"
+        android:id="@+id/action_insert_image"
+        android:title="@string/insert_image"
+        android:icon="@drawable/ic_camera" />
+    <item
+        apps:showAsAction="always"
+        android:id="@+id/action_choose_color"
+        android:title="@string/choose_color"
+        android:icon="@drawable/ic_color" />
+    <item
+        apps:showAsAction="always"
+        android:id="@+id/action_done"
+        android:title="@string/done"
+        android:icon="@drawable/ic_check" />
+</menu>
