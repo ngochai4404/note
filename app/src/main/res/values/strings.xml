@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">note</string>
+    <string name="app_name">Note</string>
     <!--menu add note-->
     <string name="insert_image">Insert image</string>
     <string name="choose_color">Choose color</string>
@@ -9,5 +9,13 @@
     
     <!--add note-->
     <string name="title">Title</string>
-    <string name="date_format">dd/mm/yyyy hh:ss</string>
+    <string name="note">Note</string>
+    <string name="date_time_format">dd/mm/yyyy hh:ss</string>
+    <string name="time_format">hh:ss</string>
+    <string name="date_format">dd/mm/yyyy</string>
+
+    <!--image picker-->
+    <string name="camera">Take photo</string>
+    <string name="gallery">Choose from gallery</string>
+    <string name="cancel">Cancel</string>
 </resources>

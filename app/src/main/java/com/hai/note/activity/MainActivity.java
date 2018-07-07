@@ -2,6 +2,7 @@ package com.hai.note.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,6 +11,12 @@ import android.view.View;
 
 import com.hai.note.R;
 import com.hai.note.activity.base.BaseActivity;
+import com.hai.note.db.DatabaseManager;
+import com.hai.note.db.table.NoteTable;
+import com.hai.note.model.ImageNote;
+import com.hai.note.model.Note;
+
+import java.util.List;
 
 public class MainActivity extends BaseActivity {
 
@@ -17,6 +24,7 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
     }
 
     @Override
@@ -38,5 +46,13 @@ public class MainActivity extends BaseActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        DatabaseManager db = new DatabaseManager(this);
+        List<Note> list = new NoteTable().getAllNotes(db);
+
     }
 }

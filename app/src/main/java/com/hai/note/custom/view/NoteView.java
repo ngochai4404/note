@@ -1,4 +1,4 @@
-package com.hai.note.custom;
+package com.hai.note.custom.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
