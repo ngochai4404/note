@@ -3,6 +3,8 @@ package com.hai.note.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,5 +129,10 @@ public class Note implements Parcelable{
         parcel.writeString(alarmTime);
         parcel.writeInt(color);
         parcel.writeTypedList(imgs);
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }

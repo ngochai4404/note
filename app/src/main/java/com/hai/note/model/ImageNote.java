@@ -3,6 +3,8 @@ package com.hai.note.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.Gson;
+
 /**
  * Created by Hai on 06/07/2018.
  */
@@ -66,5 +68,9 @@ public class ImageNote implements Parcelable{
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeInt(id);
         parcel.writeString(path);
+    }
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
     }
 }
