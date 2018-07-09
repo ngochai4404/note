@@ -18,4 +18,11 @@
     <string name="camera">Take photo</string>
     <string name="gallery">Choose from gallery</string>
     <string name="cancel">Cancel</string>
+
+    <!--dialog delete-->
+    <string name="dialog_delete_title">Confirm Delete</string>
+    <string name="dialog_delete_content">Are you sure you want to delete this?</string>
+
+    <!--share-->
+    <string name="share_dialog">Share note</string>
 </resources>

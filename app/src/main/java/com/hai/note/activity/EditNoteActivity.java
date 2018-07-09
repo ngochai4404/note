@@ -5,34 +5,30 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
+import com.hai.note.BuildConfig;
 import com.hai.note.R;
 import com.hai.note.activity.base.BaseActivity;
 import com.hai.note.custom.adapter.ImageAdapter;
 import com.hai.note.db.DatabaseManager;
-import com.hai.note.db.table.ImageNoteTable;
 import com.hai.note.db.table.NoteTable;
 import com.hai.note.model.ImageNote;
 import com.hai.note.model.Note;
@@ -41,15 +37,16 @@ import com.hai.note.utils.DialogUtils;
 import com.hai.note.utils.FileUtils;
 import com.hai.note.utils.NotificationUtils;
 
-import java.io.File;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import petrov.kristiyan.colorpicker.ColorPicker;
 
-public class AddNoteActivity extends BaseActivity {
+public class EditNoteActivity extends BaseActivity {
     private static final int PERMISSION_CODE = 99;
     public static final int GALLERY_REQUEST = 100;
     public static final int CAMERA_REQUEST = 101;
@@ -63,26 +60,58 @@ public class AddNoteActivity extends BaseActivity {
     @BindView(R.id.et_note) EditText etNote;
     @BindView(R.id.sv_root) ScrollView svRoot;
     @BindView(R.id.rcv_img) RecyclerView rcvImage;
-
+    @BindView(R.id.ibtn_next) ImageButton ibtnNext;
+    @BindView(R.id.ibtn_back) ImageButton ibtnBack;
     Uri mFile = null;
     ImageAdapter mAdapter;
     Date mDateNote, mDateAlarm;
     Note mNote;
     ImageAdapter mImageAdapter;
+    int mPos = 0;
+    List<Note> mNotes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_note);
+        setContentView(R.layout.activity_edit_note);
         ButterKnife.bind(this);
+        mNotes = getIntent().getParcelableArrayListExtra(MainActivity.LIST_NOTE);
+        mPos = getIntent().getIntExtra(MainActivity.POSTITION,0);
         init();
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        mNotes = getIntent().getParcelableArrayListExtra(MainActivity.LIST_NOTE);
+        mPos = getIntent().getIntExtra(MainActivity.POSTITION,0);
+        init();
+    }
+
     private void init(){
-        mNote = new Note();
-        mDateNote = new Date();
-        tvDateNote.setText(DateFormatUtils.dateFormat(mDateNote,DateFormatUtils.DATE_TIME));
+        mNote = mNotes.get(mPos);
+        svRoot.setBackgroundColor(mNote.getColor());
+        tvDateNote.setText(mNote.getNoteTime());
+        etTitle.setText(mNote.getTitle());
+        etNote.setText(mNote.getNote());
         mImageAdapter = new ImageAdapter(this,mNote.getImgs());
         rcvImage.setAdapter(mImageAdapter);
         rcvImage.setLayoutManager(new GridLayoutManager(this,3));
+        mDateNote = new Date();
+        if ( mNote.isAlarm() ) {
+            mDateAlarm = new Date();
+            try {
+                tvDateAlarm.setText(DateFormatUtils.dateFormat(mNote.getAlarmTime(),DateFormatUtils.DATE_TIME,DateFormatUtils.DATE));
+                tvTimeAlarm.setText(DateFormatUtils.dateFormat(mNote.getAlarmTime(),DateFormatUtils.DATE_TIME,DateFormatUtils.TIME));
+            } catch (ParseException e) {
+                tvDateAlarm.setText(DateFormatUtils.DATE);
+                tvTimeAlarm.setText(DateFormatUtils.TIME);
+            }
+        }
+        ibtnBack.setEnabled(mPos>0);
+        ibtnBack.setClickable(mPos>0);
+        ibtnNext.setEnabled(mPos<mNotes.size()-1);
+        ibtnNext.setClickable(mPos<mNotes.size()-1);
     }
     @OnClick({R.id.tv_date_alarm,R.id.ibtn_date_alarm})
     public void showDatePicker(){
@@ -115,11 +144,44 @@ public class AddNoteActivity extends BaseActivity {
             }
         });
     }
-    @OnClick(R.id.ibtn_delete)
+    @OnClick(R.id.ibtn_delete_time)
     public void deleteAlarm(){
         mDateAlarm = null;
         tvDateAlarm.setText(DateFormatUtils.DATE);
         tvTimeAlarm.setText(DateFormatUtils.TIME);
+    }
+    @OnClick(R.id.ibtn_back)
+    public void goPreviousItem(){
+        mPos--;
+        init();
+    }
+    @OnClick(R.id.ibtn_share)
+    public void share(){
+        String shareBody = etNote.getText()+"";
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, etTitle.getText()+"");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.share_dialog)));
+    }
+    @OnClick(R.id.ibtn_delete)
+    public void deleteNote(){
+        DialogUtils.showDialogYesNo(this, getString(R.string.dialog_delete_title), getString(R.string.dialog_delete_content), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (mNote.isAlarm()) {
+                    NotificationUtils.cancelNotification(getBaseContext(),mNote);
+                }
+                DatabaseManager db = new DatabaseManager(getBaseContext());
+                new NoteTable().deleteNote(mNote,db);
+                finish();
+            }
+        });
+    }
+    @OnClick(R.id.ibtn_next)
+    public void goNextItem(){
+        mPos++;
+        init();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -172,18 +234,17 @@ public class AddNoteActivity extends BaseActivity {
         mNote.setNote(etNote.getText().toString());
         if (mDateAlarm == null){
             mNote.setAlarm(false);
+            NotificationUtils.cancelNotification(getBaseContext(),mNote);
         } else {
             mNote.setAlarm(true);
             mNote.setAlarmTime(DateFormatUtils.dateFormat(mDateAlarm,DateFormatUtils.DATE_TIME));
+            NotificationUtils.createNotification(getBaseContext(),mNote);
         }
         mNote.setNoteTime(DateFormatUtils.dateFormat(mDateNote,DateFormatUtils.DATE_TIME));
 
         DatabaseManager db = new DatabaseManager(this);
         NoteTable noteTable = new NoteTable();
-        int id = noteTable.insertNote(mNote,db);
-        if( mNote.isAlarm() ){
-            NotificationUtils.createNotification(getBaseContext(),mNote);
-        }
+        noteTable.updateNote(mNote,db);
         finish();
     }
     public static boolean hasPermissions(Context context, String... permissions) {

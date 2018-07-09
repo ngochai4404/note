@@ -2,6 +2,7 @@ package com.hai.note.custom.adapter;
 
 import android.content.Context;
 import android.net.Uri;
+import android.support.v4.content.FileProvider;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.hai.note.BuildConfig;
 import com.hai.note.R;
 import com.hai.note.model.ImageNote;
 import com.hai.note.utils.FileUtils;
@@ -34,6 +36,10 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageHolder>
     public ImageAdapter(Context mContext, List<ImageNote> list) {
         this.mContext = mContext;
         this.list = list;
+    }
+
+    public List<ImageNote> getList() {
+        return list;
     }
 
     @Override

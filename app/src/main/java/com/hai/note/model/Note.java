@@ -1,5 +1,8 @@
 package com.hai.note.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +10,7 @@ import java.util.List;
  * Created by Hai on 06/07/2018.
  */
 
-public class Note {
+public class Note implements Parcelable{
 
     private int id;
     private boolean alarm = false;
@@ -21,6 +24,29 @@ public class Note {
     public Note() {
         imgs = new ArrayList<>();
     }
+
+    protected Note(Parcel in) {
+        id = in.readInt();
+        alarm = in.readByte() != 0;
+        title = in.readString();
+        note = in.readString();
+        noteTime = in.readString();
+        alarmTime = in.readString();
+        color = in.readInt();
+        imgs = in.createTypedArrayList(ImageNote.CREATOR);
+    }
+
+    public static final Creator<Note> CREATOR = new Creator<Note>() {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note(in);
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
 
     public int getId() {
         return id;
@@ -84,5 +110,22 @@ public class Note {
 
     public void setAlarmTime(String alarmTime) {
         this.alarmTime = alarmTime;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeByte((byte) (alarm ? 1 : 0));
+        parcel.writeString(title);
+        parcel.writeString(note);
+        parcel.writeString(noteTime);
+        parcel.writeString(alarmTime);
+        parcel.writeInt(color);
+        parcel.writeTypedList(imgs);
     }
 }

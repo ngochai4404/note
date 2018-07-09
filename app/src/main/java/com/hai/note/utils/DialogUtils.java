@@ -63,12 +63,36 @@ public class DialogUtils {
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, file);
                 activity.startActivityForResult(cameraIntent, CAMERA_REQUEST);
             } else if (items[item].equals(items[1])) {
-                Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                photoPickerIntent.setType("image/*");
-                activity.startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
+                Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+
+                activity.startActivityForResult(intent, GALLERY_REQUEST);
+//                Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+//                photoPickerIntent.setType("image/*");
+//                activity.startActivityForResult(photoPickerIntent, GALLERY_REQUEST);
             }
             }
         });
         builder.show();
+    }
+    public static void showDialogYesNo(Context mContext,String title, String message,DialogInterface.OnClickListener listener){
+        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        builder.setTitle(title);
+        builder.setMessage(message);
+
+        builder.setPositiveButton("YES",listener);
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Do nothing
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.hai.note.db.DatabaseManager;
 import com.hai.note.model.ImageNote;
@@ -31,12 +32,13 @@ public class ImageNoteTable  {
             + COLUMN_NOTE_ID + " INTEGER"
             + ")";
     public void insertImage(Note note, DatabaseManager data) {
+//        Log.d("insertImage",note.getId()+"");
         SQLiteDatabase db = data.getWritableDatabase();
         for (ImageNote img: note.getImgs()){
             ContentValues values = new ContentValues();
             values.put(ImageNoteTable.COLUMN_NOTE_ID, note.getId());
             values.put(ImageNoteTable.COLUMN_IMAGE, img.getPath());
-            long id = db.insert(NoteTable.TABLE_NAME, null, values);
+            long id = db.insert(ImageNoteTable.TABLE_NAME, null, values);
         }
         db.close();
     }
@@ -62,5 +64,11 @@ public class ImageNoteTable  {
 
         db.close();
         return imgs;
+    }
+    public void deleteImageNote(Note note,DatabaseManager databaseManager) {
+        SQLiteDatabase db = databaseManager.getWritableDatabase();
+        db.delete(TABLE_NAME, COLUMN_NOTE_ID + " = ?",
+                new String[]{String.valueOf(note.getId())});
+        db.close();
     }
 }

@@ -3,6 +3,7 @@ package com.hai.note.db.table;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.hai.note.db.DatabaseManager;
 import com.hai.note.model.ImageNote;
@@ -36,7 +37,7 @@ public class NoteTable {
             + COLUMN_TIME_NOTE + " TEXT,"
             + COLUMN_ALARM + " INTEGER DEFAULT 0"
             + ")";
-    public void insertNote(Note note, DatabaseManager data) {
+    public int insertNote(Note note, DatabaseManager data) {
         SQLiteDatabase db = data.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(NoteTable.COLUMN_TITLE,note.getTitle());
@@ -50,6 +51,7 @@ public class NoteTable {
         note.setId((int) id);
         ImageNoteTable table = new ImageNoteTable();
         table.insertImage(note,data);
+        return (int) id;
     }
     public List<Note> getAllNotes(DatabaseManager databaseManager) {
         List<Note> notes = new ArrayList<>();
@@ -73,6 +75,7 @@ public class NoteTable {
                 note.setAlarm(cursor.getInt(cursor.getColumnIndex(NoteTable.COLUMN_ALARM))==1?true:false);
                 note.setColor(cursor.getInt(cursor.getColumnIndex(NoteTable.COLUMN_COLOR)));
                 note.setImgs((ArrayList<ImageNote>) imageNoteTable.getAllImageNotes(databaseManager,note.getId()));
+                Log.d("noteItem",note.getImgs().size()+"");
                 notes.add(note);
             } while (cursor.moveToNext());
         }
@@ -80,5 +83,29 @@ public class NoteTable {
         db.close();
 
         return notes;
+    }
+    public void deleteNote(Note note,DatabaseManager databaseManager) {
+        new ImageNoteTable().deleteImageNote(note,databaseManager);
+        SQLiteDatabase db = databaseManager.getWritableDatabase();
+        db.delete(TABLE_NAME, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(note.getId())});
+        db.close();
+    }
+    public void updateNote(Note note,DatabaseManager databaseManager) {
+        SQLiteDatabase db = databaseManager.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(NoteTable.COLUMN_TITLE,note.getTitle());
+        values.put(NoteTable.COLUMN_NOTE, note.getNote());
+        values.put(NoteTable.COLUMN_COLOR, note.getColor());
+        values.put(NoteTable.COLUMN_TIME_ALARM, note.getAlarmTime());
+        values.put(NoteTable.COLUMN_TIME_NOTE, note.getNoteTime());
+        values.put(NoteTable.COLUMN_ALARM,note.isAlarm());
+
+        // updating row
+        int id =  db.update(TABLE_NAME, values, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(note.getId())});
+        new ImageNoteTable().deleteImageNote(note,databaseManager);
+        new ImageNoteTable().insertImage(note,databaseManager);
     }
 }
