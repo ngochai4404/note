@@ -12,7 +12,7 @@ import java.util.List;
  * Created by Hai on 06/07/2018.
  */
 
-public class Note implements Parcelable{
+public class Note implements Parcelable {
 
     private int id;
     private boolean alarm = false;

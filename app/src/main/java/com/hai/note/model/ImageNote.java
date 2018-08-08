@@ -9,12 +9,11 @@ import com.google.gson.Gson;
  * Created by Hai on 06/07/2018.
  */
 
-public class ImageNote implements Parcelable{
+public class ImageNote implements Parcelable {
     private int id;
     private String path;
 
     public ImageNote() {
-
     }
 
     public ImageNote(String path) {
@@ -69,6 +68,7 @@ public class ImageNote implements Parcelable{
         parcel.writeInt(id);
         parcel.writeString(path);
     }
+
     @Override
     public String toString() {
         return new Gson().toJson(this);

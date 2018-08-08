@@ -13,10 +13,10 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -24,7 +24,6 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.hai.note.BuildConfig;
 import com.hai.note.R;
 import com.hai.note.activity.base.BaseActivity;
 import com.hai.note.custom.adapter.ImageAdapter;
@@ -51,17 +50,26 @@ public class EditNoteActivity extends BaseActivity {
     public static final int GALLERY_REQUEST = 100;
     public static final int CAMERA_REQUEST = 101;
     String permissions[] = {Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA};
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
-    @BindView(R.id.tv_date_alarm)TextView tvDateAlarm;
-    @BindView(R.id.tv_time_alarm)TextView tvTimeAlarm;
-    @BindView(R.id.tv_date) TextView tvDateNote;
-    @BindView(R.id.et_title) EditText etTitle;
-    @BindView(R.id.et_note) EditText etNote;
-    @BindView(R.id.sv_root) ScrollView svRoot;
-    @BindView(R.id.rcv_img) RecyclerView rcvImage;
-    @BindView(R.id.ibtn_next) ImageButton ibtnNext;
-    @BindView(R.id.ibtn_back) ImageButton ibtnBack;
+    @BindView(R.id.tv_date_alarm)
+    TextView tvDateAlarm;
+    @BindView(R.id.tv_time_alarm)
+    TextView tvTimeAlarm;
+    @BindView(R.id.tv_date)
+    TextView tvDateNote;
+    @BindView(R.id.et_title)
+    EditText etTitle;
+    @BindView(R.id.et_note)
+    EditText etNote;
+    @BindView(R.id.sv_root)
+    ScrollView svRoot;
+    @BindView(R.id.rcv_img)
+    RecyclerView rcvImage;
+    @BindView(R.id.ibtn_next)
+    ImageButton ibtnNext;
+    @BindView(R.id.ibtn_back)
+    ImageButton ibtnBack;
     Uri mFile = null;
     ImageAdapter mAdapter;
     Date mDateNote, mDateAlarm;
@@ -75,131 +83,144 @@ public class EditNoteActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_note);
         ButterKnife.bind(this);
+        bindingData();
+        initData();
+    }
+
+    protected void bindingData() {
         mNotes = getIntent().getParcelableArrayListExtra(MainActivity.LIST_NOTE);
-        mPos = getIntent().getIntExtra(MainActivity.POSTITION,0);
-        init();
+        mPos = getIntent().getIntExtra(MainActivity.POSTITION, 0);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         mNotes = getIntent().getParcelableArrayListExtra(MainActivity.LIST_NOTE);
-        mPos = getIntent().getIntExtra(MainActivity.POSTITION,0);
-        init();
+        mPos = getIntent().getIntExtra(MainActivity.POSTITION, 0);
+        initData();
     }
 
-    private void init(){
+    private void initData() {
         mNote = mNotes.get(mPos);
         svRoot.setBackgroundColor(mNote.getColor());
         tvDateNote.setText(mNote.getNoteTime());
         etTitle.setText(mNote.getTitle());
         etNote.setText(mNote.getNote());
-        mImageAdapter = new ImageAdapter(this,mNote.getImgs());
+        mImageAdapter = new ImageAdapter(this, mNote.getImgs());
         rcvImage.setAdapter(mImageAdapter);
-        rcvImage.setLayoutManager(new GridLayoutManager(this,3));
+        rcvImage.setLayoutManager(new GridLayoutManager(this, 3));
         mDateNote = new Date();
-        if ( mNote.isAlarm() ) {
+        if (mNote.isAlarm()) {
             mDateAlarm = new Date();
             try {
-                tvDateAlarm.setText(DateFormatUtils.dateFormat(mNote.getAlarmTime(),DateFormatUtils.DATE_TIME,DateFormatUtils.DATE));
-                tvTimeAlarm.setText(DateFormatUtils.dateFormat(mNote.getAlarmTime(),DateFormatUtils.DATE_TIME,DateFormatUtils.TIME));
+                tvDateAlarm.setText(DateFormatUtils.dateFormat(mNote.getAlarmTime(), DateFormatUtils.DATE_TIME, DateFormatUtils.DATE));
+                tvTimeAlarm.setText(DateFormatUtils.dateFormat(mNote.getAlarmTime(), DateFormatUtils.DATE_TIME, DateFormatUtils.TIME));
             } catch (ParseException e) {
                 tvDateAlarm.setText(DateFormatUtils.DATE);
                 tvTimeAlarm.setText(DateFormatUtils.TIME);
             }
         }
-        ibtnBack.setEnabled(mPos>0);
-        ibtnBack.setClickable(mPos>0);
-        ibtnNext.setEnabled(mPos<mNotes.size()-1);
-        ibtnNext.setClickable(mPos<mNotes.size()-1);
+        ibtnBack.setVisibility(mPos > 0 ? View.VISIBLE : View.INVISIBLE);
+        ibtnBack.setClickable(mPos > 0);
+        ibtnNext.setVisibility(mPos < mNotes.size() - 1 ? View.VISIBLE : View.INVISIBLE);
+        ibtnNext.setClickable(mPos < mNotes.size() - 1);
     }
-    @OnClick({R.id.tv_date_alarm,R.id.ibtn_date_alarm})
-    public void showDatePicker(){
+
+    @OnClick({R.id.tv_date_alarm, R.id.ibtn_date_alarm})
+    public void showDatePicker() {
         DialogUtils.showDatePicker(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                if ( mDateAlarm == null ) {
+                if (mDateAlarm == null) {
                     mDateAlarm = new Date();
-                    tvTimeAlarm.setText(DateFormatUtils.dateFormat(mDateAlarm,DateFormatUtils.TIME));
+                    tvTimeAlarm.setText(DateFormatUtils.dateFormat(mDateAlarm, DateFormatUtils.TIME));
                 }
-                mDateAlarm.setYear(i-1900);
+                mDateAlarm.setYear(i - 1900);
                 mDateAlarm.setMonth(i1);
                 mDateAlarm.setDate(i2);
-                tvDateAlarm.setText(DateFormatUtils.dateFormat(mDateAlarm,DateFormatUtils.DATE));
+                tvDateAlarm.setText(DateFormatUtils.dateFormat(mDateAlarm, DateFormatUtils.DATE));
             }
         });
     }
-    @OnClick({R.id.tv_time_alarm,R.id.ibtn_time_alarm})
-    public void showTimePicker(){
+
+    @OnClick({R.id.tv_time_alarm, R.id.ibtn_time_alarm})
+    public void showTimePicker() {
         DialogUtils.showTimePicker(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int i, int i1) {
-                if ( mDateAlarm == null ) {
+                if (mDateAlarm == null) {
                     mDateAlarm = new Date();
-                    tvDateAlarm.setText(DateFormatUtils.dateFormat(mDateAlarm,DateFormatUtils.DATE));
+                    tvDateAlarm.setText(DateFormatUtils.dateFormat(mDateAlarm, DateFormatUtils.DATE));
                 }
                 mDateAlarm.setHours(i);
                 mDateAlarm.setMinutes(i1);
-                tvTimeAlarm.setText(DateFormatUtils.dateFormat(mDateAlarm,DateFormatUtils.TIME));
+                tvTimeAlarm.setText(DateFormatUtils.dateFormat(mDateAlarm, DateFormatUtils.TIME));
             }
         });
     }
+
     @OnClick(R.id.ibtn_delete_time)
-    public void deleteAlarm(){
+    public void deleteAlarm() {
         mDateAlarm = null;
         tvDateAlarm.setText(DateFormatUtils.DATE);
         tvTimeAlarm.setText(DateFormatUtils.TIME);
     }
+
     @OnClick(R.id.ibtn_back)
-    public void goPreviousItem(){
+    public void goPreviousItem() {
         mPos--;
-        init();
+        initData();
     }
+
     @OnClick(R.id.ibtn_share)
-    public void share(){
-        String shareBody = etNote.getText()+"";
+    public void share() {
+        String shareBody = etNote.getText() + "";
         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, etTitle.getText()+"");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, etTitle.getText() + "");
         sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
         startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.share_dialog)));
     }
+
     @OnClick(R.id.ibtn_delete)
-    public void deleteNote(){
+    public void deleteNote() {
         DialogUtils.showDialogYesNo(this, getString(R.string.dialog_delete_title), getString(R.string.dialog_delete_content), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (mNote.isAlarm()) {
-                    NotificationUtils.cancelNotification(getBaseContext(),mNote);
+                    NotificationUtils.cancelNotification(getBaseContext(), mNote);
                 }
                 DatabaseManager db = new DatabaseManager(getBaseContext());
-                new NoteTable().deleteNote(mNote,db);
+                new NoteTable().deleteNote(mNote, db);
                 finish();
             }
         });
     }
+
     @OnClick(R.id.ibtn_next)
-    public void goNextItem(){
+    public void goNextItem() {
         mPos++;
-        init();
+        initData();
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_add_note, menu);
-
         // return true so that the menu pop up is opened
         return true;
     }
-    public Uri createFile(){
-        if (mFile == null ) {
+
+    public Uri createFile() {
+        if (mFile == null) {
             mFile = Uri.fromFile(FileUtils.getOutputMediaFile());
         }
         return mFile;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch ( item.getItemId() ) {
+        switch (item.getItemId()) {
             case R.id.action_choose_color:
                 DialogUtils.showColorPicker(this, new ColorPicker.OnChooseColorListener() {
                     @Override
@@ -210,13 +231,12 @@ public class EditNoteActivity extends BaseActivity {
 
                     @Override
                     public void onCancel() {
-
                     }
                 });
                 break;
             case R.id.action_insert_image:
-                if (hasPermissions(this,permissions)){
-                    DialogUtils.showImagePicker(this,createFile());
+                if (hasPermissions(this, permissions)) {
+                    DialogUtils.showImagePicker(this, createFile());
                 } else {
                     ActivityCompat.requestPermissions(this, permissions, PERMISSION_CODE);
                 }
@@ -229,24 +249,25 @@ public class EditNoteActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-    public void saveNote(){
+
+    public void saveNote() {
         mNote.setTitle(etTitle.getText().toString());
         mNote.setNote(etNote.getText().toString());
-        if (mDateAlarm == null){
+        if (mDateAlarm == null) {
             mNote.setAlarm(false);
-            NotificationUtils.cancelNotification(getBaseContext(),mNote);
+            NotificationUtils.cancelNotification(getBaseContext(), mNote);
         } else {
             mNote.setAlarm(true);
-            mNote.setAlarmTime(DateFormatUtils.dateFormat(mDateAlarm,DateFormatUtils.DATE_TIME));
-            NotificationUtils.createNotification(getBaseContext(),mNote);
+            mNote.setAlarmTime(DateFormatUtils.dateFormat(mDateAlarm, DateFormatUtils.DATE_TIME));
+            NotificationUtils.createNotification(getBaseContext(), mNote);
         }
-        mNote.setNoteTime(DateFormatUtils.dateFormat(mDateNote,DateFormatUtils.DATE_TIME));
-
+        mNote.setNoteTime(DateFormatUtils.dateFormat(mDateNote, DateFormatUtils.DATE_TIME));
         DatabaseManager db = new DatabaseManager(this);
         NoteTable noteTable = new NoteTable();
-        noteTable.updateNote(mNote,db);
+        noteTable.updateNote(mNote, db);
         finish();
     }
+
     public static boolean hasPermissions(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
@@ -261,12 +282,13 @@ public class EditNoteActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if ( requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK ) {
-            mNote.getImgs().add(new ImageNote(mFile.getPath()));
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
+            String path = FileUtils.FILE + mFile.getPath();
+            mNote.getImgs().add(new ImageNote(path));
             mImageAdapter.notifyDataSetChanged();
             mFile = null;
-        } else if ( requestCode == GALLERY_REQUEST) {
-            mNote.getImgs().add(new ImageNote(FileUtils.getPathFromURI(data.getData(),this)));
+        } else if (requestCode == GALLERY_REQUEST) {
+            mNote.getImgs().add(new ImageNote(FileUtils.getPathFromURI(data.getData(), this)));
             mImageAdapter.notifyDataSetChanged();
         }
     }

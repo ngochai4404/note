@@ -5,5 +5,5 @@ package com.hai.note.interfaces;
  */
 
 public interface ItemOnClick {
-    public void onClick (Object object, int pos);
+    void onClick(Object object, int pos);
 }

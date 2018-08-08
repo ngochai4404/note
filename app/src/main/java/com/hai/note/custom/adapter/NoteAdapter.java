@@ -1,7 +1,6 @@
 package com.hai.note.custom.adapter;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import com.hai.note.model.Note;
 import com.hai.note.utils.DateFormatUtils;
 
 import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -25,7 +23,7 @@ import butterknife.ButterKnife;
  * Created by Hai on 09/07/2018.
  */
 
-public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteHolder>{
+public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteHolder> {
     List<Note> mNotes;
     ItemOnClick itemOnClick;
 
@@ -36,7 +34,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteHolder>{
 
     @Override
     public NoteHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_note,parent,false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_note, parent, false);
         return new NoteHolder(v);
     }
 
@@ -46,10 +44,10 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteHolder>{
         holder.llItem.setBackgroundColor(note.getColor());
         holder.tvTitle.setText(note.getTitle());
         holder.tvContent.setText(note.getNote());
-        holder.imgAlarm.setVisibility(note.isAlarm()?View.VISIBLE:View.GONE);
-        String date ;
+        holder.imgAlarm.setVisibility(note.isAlarm() ? View.VISIBLE : View.GONE);
+        String date;
         try {
-            date = DateFormatUtils.dateFormat(note.getNoteTime(),DateFormatUtils.DATE_TIME, DateFormatUtils.DATE_TIME_TYPE_2);
+            date = DateFormatUtils.dateFormat(note.getNoteTime(), DateFormatUtils.DATE_TIME, DateFormatUtils.DATE_TIME_TYPE_2);
         } catch (ParseException e) {
             date = "";
         }
@@ -57,7 +55,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteHolder>{
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                itemOnClick.onClick(note,position);
+                itemOnClick.onClick(note, position);
             }
         });
     }
@@ -68,14 +66,20 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteHolder>{
     }
 
     class NoteHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.tv_time_alarm) TextView tvTimeAlarm;
-        @BindView(R.id.tv_content) TextView tvContent;
-        @BindView(R.id.tv_title) TextView tvTitle;
-        @BindView(R.id.img_alarm) ImageView imgAlarm;
-        @BindView(R.id.ll_item) LinearLayout llItem;
+        @BindView(R.id.tv_time_alarm)
+        TextView tvTimeAlarm;
+        @BindView(R.id.tv_content)
+        TextView tvContent;
+        @BindView(R.id.tv_title)
+        TextView tvTitle;
+        @BindView(R.id.img_alarm)
+        ImageView imgAlarm;
+        @BindView(R.id.ll_item)
+        LinearLayout llItem;
+
         public NoteHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
         }
     }
 }

@@ -28,7 +28,6 @@ public class DatabaseManager extends SQLiteOpenHelper {
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         // create notes table
         db.execSQL(NoteTable.CREATE_TABLE);
         db.execSQL(ImageNoteTable.CREATE_TABLE);
@@ -43,7 +42,6 @@ public class DatabaseManager extends SQLiteOpenHelper {
         // Create tables again
         onCreate(db);
     }
-
 
 
 }

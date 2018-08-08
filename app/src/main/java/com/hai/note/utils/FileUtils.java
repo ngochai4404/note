@@ -20,7 +20,7 @@ import java.util.Date;
  */
 
 public class FileUtils {
-
+    public static final String FILE= "file:///";
     public static final String FOLDER_NAME = "note";
     public static File getOutputMediaFile(){
         File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
@@ -55,8 +55,7 @@ public class FileUtils {
             BitmapFactory.decodeStream(new FileInputStream(f), null, o);
 
             // The new size we want to scale to
-            final int REQUIRED_SIZE=50;
-
+            final int REQUIRED_SIZE=100;
             // Find the correct scale value. It should be the power of 2.
             int scale = 1;
             while(o.outWidth / scale / 2 >= REQUIRED_SIZE &&
